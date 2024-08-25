@@ -3,6 +3,10 @@ from utils.utils import get_key, simplify_text
 import sys
 from tqdm import tqdm
 
+#
+# simplifies the dataset using the fine-tuned gpt model, check the sample_dataset for the input format
+#
+
 api_key = get_key('../utils/api_key.txt')
 client  = openai.OpenAI(api_key=api_key)
 

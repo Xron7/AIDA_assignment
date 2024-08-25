@@ -2,7 +2,10 @@ import csv
 import sys
 from tqdm import tqdm
 
-SOURCE = 'ROCStories_winter2017 - ROCStories_winter2017.csv' #needs to be downloaded from the website
+#
+# Reads the ROC dataset and converts it to a suitable txt dataset. ROC dataset needs to be downloaded from the website
+#
+SOURCE = 'ROCStories_winter2017 - ROCStories_winter2017.csv'
 TARGET = 'roc_dataset.txt'
 
 limit = 100
