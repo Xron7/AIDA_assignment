@@ -6,8 +6,8 @@ import csv
 #{"messages": [{"role": "system", "content": "Marv is a factual chatbot that is also sarcastic."}, {"role": "user", "content": "What's the capital of France?"}, {"role": "assistant", "content": "Paris, as if everyone doesn't know that already."}]}
 #
 
-SOURCE = 'simplify_dataset.csv'
-TARGET = 'simplify_dataset.jsonl'
+SOURCE = 'fine_tune_simplify.csv'
+TARGET = 'fine_tune_simplify.jsonl'
 PROMPT = "Transform the following sentences by replacing all pronouns (e.g., he, she, it, they, his, her, their) and relative clauses (e.g., who, that, which) with the corresponding actual entities, ensuring that the text remains grammatically correct and clear. Focus on maintaining the original meaning while explicitly stating each entity."
 
 user_messages      = []
