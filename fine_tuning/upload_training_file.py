@@ -1,6 +1,6 @@
 import sys
 import openai
-from utils import get_key
+from utils.utils import get_key
 
 api_key = get_key()
 
