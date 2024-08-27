@@ -1,3 +1,7 @@
+import networkx as nx
+import matplotlib as plt
+import json
+
 # gets the api key from the text file
 def get_key(file="api_key.txt"):
     f = open(file, "r")
@@ -20,6 +24,7 @@ def simplify_text(text, client):
     )
 
     return completion.choices[0].message.content
+
 
 # creates a knowledge graph from the text
 def create_graph(text, nlp):
@@ -60,6 +65,13 @@ def create_graph(text, nlp):
 
         # Print relationships if subject, verb, and object are identified
         if subject and object_ and verb:
+            # rest of the subjects
+            if subject not in entities.keys():
+                counter += 1
+                entities[subject] = counter
+                entity_obj = {"id": counter, "name": object_, "label": "OTHER"}
+                json_data["entities"].append(entity_obj)
+
             # common nouns
             if object_ not in entities.keys():
                 counter += 1
@@ -68,7 +80,7 @@ def create_graph(text, nlp):
                 json_data["entities"].append(entity_obj)
 
             # triplets
-            relation_obj = {"source": subject, "target": object_, "relation": verb}
+            relation_obj = {"source": entities[subject], "target": entities[object_], "relation": verb}
             json_data["relationships"].append(relation_obj)
 
     return json_data
