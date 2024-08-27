@@ -20,3 +20,55 @@ def simplify_text(text, client):
     )
 
     return completion.choices[0].message.content
+
+# creates a knowledge graph from the text
+def create_graph(text, nlp):
+    doc = nlp(text)
+
+    json_data = {
+        "entities": [],
+        "relationships": []
+    }
+
+    # entities
+    # proper nouns
+    entities = {}
+    counter = 0
+    for ent in doc.ents:
+        if ent.text not in entities.keys():
+            counter += 1
+            entities[ent.text] = counter
+            entity_obj = {"id": counter, "name": ent.text, "label": ent.label_}
+
+            json_data["entities"].append(entity_obj)
+
+    # common nouns and
+    # relations/triplets
+    for sent in doc.sents:
+        subject = None
+        object_ = None
+        verb    = None
+
+        for token in sent:
+            if 'subj' in token.dep_:
+                subject = token.text
+            if 'obj' in token.dep_:
+                object_ = token.text
+
+            if token.pos_ == 'VERB':
+                verb = token.lemma_
+
+        # Print relationships if subject, verb, and object are identified
+        if subject and object_ and verb:
+            # common nouns
+            if object_ not in entities.keys():
+                counter += 1
+                entities[object_] = counter
+                entity_obj = {"id": counter, "name": object_, "label": "COMMON_NOUN"}
+                json_data["entities"].append(entity_obj)
+
+            # triplets
+            relation_obj = {"source": subject, "target": object_, "relation": verb}
+            json_data["relationships"].append(relation_obj)
+
+    return json_data
