@@ -1,5 +1,5 @@
 import networkx as nx
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import json
 
 # gets the api key from the text file
@@ -84,3 +84,35 @@ def create_graph(text, nlp):
             json_data["relationships"].append(relation_obj)
 
     return json_data
+
+
+# visualizes a graph
+def visualize_graph(json_data):
+    G = nx.DiGraph()
+
+    # Add entities (nodes) to the graph
+    entities = {entity['id']: entity['name'] for entity in json_data['entities']}
+    for entity_id, entity_name in entities.items():
+        G.add_node(entity_id, label=entity_name)
+
+    # Add relationships (edges) to the graph
+    for relationship in json_data['relationships']:
+        source = relationship['source']
+        target = relationship['target']
+        relation = relationship['relation']
+        G.add_edge(source, target, label=relation)
+
+    # Define positions for a better layout
+    pos = nx.spring_layout(G)
+
+    # Draw the nodes with labels
+    nx.draw(G, pos, with_labels=True, labels=entities, node_color='lightblue', node_size=3000, font_size=10,
+            font_weight='bold', arrows=True)
+
+    # Draw the edges with labels
+    edge_labels = nx.get_edge_attributes(G, 'label')
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=8, font_color='red')
+
+    # Display the graph
+    plt.title("Knowledge Graph Visualization")
+    plt.show()
