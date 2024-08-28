@@ -1,6 +1,5 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import json
 
 # gets the api key from the text file
 def get_key(file="api_key.txt"):
@@ -26,8 +25,7 @@ def simplify_text(text, client):
     return completion.choices[0].message.content
 
 # checks if the noun is needed to be appended as an entity
-def noun_2_entity(noun, entities):
-    entity_list  = entities.keys()
+def noun_2_entity(noun, entity_list):
     string_lists = [string.split() for string in entity_list]
 
     actual_entity = 0
@@ -36,6 +34,16 @@ def noun_2_entity(noun, entities):
             actual_entity = ' '.join(sublist)
 
     return actual_entity
+
+
+# gets the attributes of the entity from the doc
+def get_attributes(entity, doc):
+    attributes = []
+    for token in doc:
+        candidate = token.head.text
+        if candidate == entity and token.dep_ == "amod":
+            attributes.append(token.text)
+    return attributes
 
 
 # creates a knowledge graph from the text
@@ -52,10 +60,19 @@ def create_graph(text, nlp):
     entities = {}
     counter = 0
     for ent in doc.ents:
-        if ent.text not in entities.keys():
+        ent_name = ent.text
+        if ent_name not in entities.keys():
             counter += 1
-            entities[ent.text] = counter
-            entity_obj = {"id": counter, "name": ent.text, "label": ent.label_}
+            entities[ent_name] = counter
+
+            # get the head
+            ent_head = ent_name
+            for token in ent:
+                if 'subj' in token.dep_ or 'obj' in token.dep_:
+                    ent_head = token.text
+                    break
+
+            entity_obj = {"id": counter, "name": ent.text, "label": ent.label_, "attributes": get_attributes(ent_head, doc)}
 
             json_data["entities"].append(entity_obj)
 
@@ -83,14 +100,14 @@ def create_graph(text, nlp):
         # Print relationships if subject, verb, and object are identified
         if subject and object_ and verb:
             # rest of the subjects
-            subj_entity = noun_2_entity(subject, entities)
-            obj_entity  = noun_2_entity(object_, entities)
+            subj_entity = noun_2_entity(subject, entities.keys())
+            obj_entity  = noun_2_entity(object_, entities.keys())
 
             # no matches found, needs to be added
             if subj_entity == 0:
                 counter += 1
                 entities[subject] = counter
-                entity_obj = {"id": counter, "name": subject, "label": "OTHER"}
+                entity_obj = {"id": counter, "name": subject, "label": "OTHER", "attributes": get_attributes(subject, doc)}
                 json_data["entities"].append(entity_obj)
             # else replace with the complete
             else:
@@ -101,7 +118,7 @@ def create_graph(text, nlp):
             if obj_entity == 0:
                 counter += 1
                 entities[object_] = counter
-                entity_obj = {"id": counter, "name": object_, "label": "COMMON_NOUN"}
+                entity_obj = {"id": counter, "name": object_, "label": "COMMON_NOUN", "attributes": get_attributes(object_, doc)}
                 json_data["entities"].append(entity_obj)
             else:
                 object_ = obj_entity
@@ -143,3 +160,5 @@ def visualize_graph(json_data):
     # Display the graph
     plt.title("Knowledge Graph Visualization")
     plt.show()
+
+    return None
