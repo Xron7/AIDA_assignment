@@ -26,11 +26,16 @@ def simplify_text(text, client):
     return completion.choices[0].message.content
 
 # checks if the noun is needed to be appended as an entity
-def exists_on_entities(noun, entities):
-    if noun not in entities.keys():
-        return False
-    else:
-        return True
+def noun_2_entity(noun, entities):
+    entity_list  = entities.keys()
+    string_lists = [string.split() for string in entity_list]
+
+    actual_entity = 0
+    for sublist in string_lists:
+        if noun in sublist:
+            actual_entity = ' '.join(sublist)
+
+    return actual_entity
 
 
 # creates a knowledge graph from the text
@@ -78,18 +83,28 @@ def create_graph(text, nlp):
         # Print relationships if subject, verb, and object are identified
         if subject and object_ and verb:
             # rest of the subjects
-            if not exists_on_entities(subject, entities):
+            subj_entity = noun_2_entity(subject, entities)
+            obj_entity  = noun_2_entity(object_, entities)
+
+            # no matches found, needs to be added
+            if subj_entity == 0:
                 counter += 1
                 entities[subject] = counter
                 entity_obj = {"id": counter, "name": subject, "label": "OTHER"}
                 json_data["entities"].append(entity_obj)
+            # else replace with the complete
+            else:
+                subject = subj_entity
 
             # common nouns
-            if not exists_on_entities(object_, entities):
+            # no matches found, needs to be added
+            if obj_entity == 0:
                 counter += 1
                 entities[object_] = counter
                 entity_obj = {"id": counter, "name": object_, "label": "COMMON_NOUN"}
                 json_data["entities"].append(entity_obj)
+            else:
+                object_ = obj_entity
 
             # triplets
             relation_obj = {"source": entities[subject], "target": entities[object_], "relation": verb}
