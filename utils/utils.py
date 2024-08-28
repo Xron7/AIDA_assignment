@@ -63,6 +63,11 @@ def create_graph(text, nlp):
             if token.pos_ == 'VERB':
                 verb = token.lemma_
 
+                # phrasal verb
+                for child in token.children:
+                    if child.dep_ == "prep" and child.pos_ == "ADP":
+                        verb = f"{verb} {child.text}"
+
         # Print relationships if subject, verb, and object are identified
         if subject and object_ and verb:
             # rest of the subjects
