@@ -74,7 +74,7 @@ def create_graph(text, nlp):
             if subject not in entities.keys():
                 counter += 1
                 entities[subject] = counter
-                entity_obj = {"id": counter, "name": object_, "label": "OTHER"}
+                entity_obj = {"id": counter, "name": subject, "label": "OTHER"}
                 json_data["entities"].append(entity_obj)
 
             # common nouns
