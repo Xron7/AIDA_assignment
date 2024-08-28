@@ -25,6 +25,13 @@ def simplify_text(text, client):
 
     return completion.choices[0].message.content
 
+# checks if the noun is needed to be appended as an entity
+def exists_on_entities(noun, entities):
+    if noun not in entities.keys():
+        return False
+    else:
+        return True
+
 
 # creates a knowledge graph from the text
 def create_graph(text, nlp):
@@ -71,14 +78,14 @@ def create_graph(text, nlp):
         # Print relationships if subject, verb, and object are identified
         if subject and object_ and verb:
             # rest of the subjects
-            if subject not in entities.keys():
+            if not exists_on_entities(subject, entities):
                 counter += 1
                 entities[subject] = counter
                 entity_obj = {"id": counter, "name": subject, "label": "OTHER"}
                 json_data["entities"].append(entity_obj)
 
             # common nouns
-            if object_ not in entities.keys():
+            if not exists_on_entities(object_, entities):
                 counter += 1
                 entities[object_] = counter
                 entity_obj = {"id": counter, "name": object_, "label": "COMMON_NOUN"}
