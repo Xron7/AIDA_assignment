@@ -38,14 +38,15 @@ def noun_2_entity(noun, entity_list):
 
 # gets the attributes of the entity from the doc
 def get_attributes(entity, doc):
-    attributes = []
+    attributes    = []
     enhance_types = ['compound', 'conj', 'amod']
+
     for token in doc:
         token_head = token.head
 
         if token_head.text == entity and token.dep_ == "amod":
-            token_text = token.text
             attributes.append(token.text)
+
             for child in token.children:
                 if child.dep_ in enhance_types:
                     attributes.append(child.text)
@@ -54,10 +55,12 @@ def get_attributes(entity, doc):
             for child in token_head.children:
                 if child.dep_ == 'attr':
                     attributes.append(child.text)
+
                     for subchild in child.children:
                         if subchild.dep_ in enhance_types:
                             attributes.append(subchild.text)
-    return attributes
+
+    return {f"attribute{i+1}": value for i, value in enumerate(attributes)}
 
 
 # creates a knowledge graph from the text
@@ -86,7 +89,7 @@ def create_graph(text, nlp):
                     ent_head = token.text
                     break
 
-            entity_obj = {"id": counter, "name": ent.text, "label": ent.label_, "attributes": get_attributes(ent_head, doc)}
+            entity_obj = {"id": counter, "name": ent.text, "label": ent.label_, "noun_type": "PROPER", "attributes": get_attributes(ent_head, doc)}
 
             json_data["entities"].append(entity_obj)
 
@@ -121,7 +124,7 @@ def create_graph(text, nlp):
             if subj_entity == 0:
                 counter += 1
                 entities[subject] = counter
-                entity_obj = {"id": counter, "name": subject, "label": "OTHER", "attributes": get_attributes(subject, doc)}
+                entity_obj = {"id": counter, "name": subject, "label": "OTHER", "noun_type": "COMMON", "attributes": get_attributes(subject, doc)}
                 json_data["entities"].append(entity_obj)
             # else replace with the complete
             else:
@@ -132,7 +135,7 @@ def create_graph(text, nlp):
             if obj_entity == 0:
                 counter += 1
                 entities[object_] = counter
-                entity_obj = {"id": counter, "name": object_, "label": "COMMON_NOUN", "attributes": get_attributes(object_, doc)}
+                entity_obj = {"id": counter, "name": object_, "label": "COMMON_NOUN", "noun_type": "COMMON", "attributes": get_attributes(object_, doc)}
                 json_data["entities"].append(entity_obj)
             else:
                 object_ = obj_entity
