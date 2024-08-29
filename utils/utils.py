@@ -39,10 +39,24 @@ def noun_2_entity(noun, entity_list):
 # gets the attributes of the entity from the doc
 def get_attributes(entity, doc):
     attributes = []
+    enhance_types = ['compound', 'conj', 'amod']
     for token in doc:
-        candidate = token.head.text
-        if candidate == entity and token.dep_ == "amod":
+        token_head = token.head
+
+        if token_head.text == entity and token.dep_ == "amod":
+            token_text = token.text
             attributes.append(token.text)
+            for child in token.children:
+                if child.dep_ in enhance_types:
+                    attributes.append(child.text)
+
+        if token.text == entity and token_head.dep_ == 'ROOT':
+            for child in token_head.children:
+                if child.dep_ == 'attr':
+                    attributes.append(child.text)
+                    for subchild in child.children:
+                        if subchild.dep_ in enhance_types:
+                            attributes.append(subchild.text)
     return attributes
 
 
