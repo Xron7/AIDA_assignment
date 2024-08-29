@@ -152,9 +152,24 @@ def visualize_graph(json_data):
     G = nx.DiGraph()
 
     # Add entities (nodes) to the graph
-    entities = {entity['id']: entity['name'] for entity in json_data['entities']}
+    entities = {}
+    node_sizes = []
+    for ent in json_data['entities']:
+        attributes = ent['attributes']
+        attributes_str = '\n '.join(f'{k}: {v}' for k, v in attributes.items()) if attributes else ''
+        ent_name = ent['name']
+        ent_label = f'{ent_name}\n {attributes_str}'
+
+        entities[ent['id']] = ent_label
+
+        # calculate node size
+        num_lines = len(attributes) + 1
+        max_line_length = max(len(line) for line in ent_label.split("\n"))
+
+        node_sizes.append(max_line_length * 600 + num_lines * 800)
+
     for entity_id, entity_name in entities.items():
-        G.add_node(entity_id, label=entity_name)
+        G.add_node(entity_id)
 
     # Add relationships (edges) to the graph
     for relationship in json_data['relationships']:
@@ -167,7 +182,7 @@ def visualize_graph(json_data):
     pos = nx.spring_layout(G)
 
     # Draw the nodes with labels
-    nx.draw(G, pos, with_labels=True, labels=entities, node_color='lightblue', node_size=3000, font_size=10,
+    nx.draw(G, pos, with_labels=True, labels=entities, node_color='lightblue', node_size=node_sizes, font_size=10,
             font_weight='bold', arrows=True)
 
     # Draw the edges with labels
