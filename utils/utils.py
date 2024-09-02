@@ -1,6 +1,3 @@
-import networkx as nx
-import matplotlib.pyplot as plt
-
 # gets the api key from the text file
 def get_key(file="api_key.txt"):
     f = open(file, "r")
@@ -11,7 +8,10 @@ def get_key(file="api_key.txt"):
 
 # simplifies a sentence (removes he/his/him and who/that/which etc.)
 def simplify_text(text, client):
-    prompt = "Transform the following sentences by replacing all pronouns (e.g., he, she, it, they, his, her, their) and relative clauses (e.g., who, that, which) with the corresponding actual entities, ensuring that the text remains grammatically correct and clear. Focus on maintaining the original meaning while explicitly stating each entity."
+    prompt = ("Transform the following sentences by replacing all pronouns (e.g., he, she, it, they, his, her, "
+              "their) and relative clauses (e.g., who, that, which) with the corresponding actual entities, "
+              "ensuring that the text remains grammatically correct and clear. Focus on maintaining the original "
+              "meaning while explicitly stating each entity.")
     request = "Please simplify the sentence I will give you in the next message. Return ONLY the simplified sentence"
     completion = client.chat.completions.create(
         model="ft:gpt-4o-mini-2024-07-18:personal::A0BlPz97",
@@ -149,6 +149,9 @@ def create_graph(text, nlp):
 
 # visualizes a graph
 def visualize_graph(json_data):
+    import networkx as nx
+    import matplotlib.pyplot as plt
+
     G = nx.DiGraph()
 
     # Add entities (nodes) to the graph
