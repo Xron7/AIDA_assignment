@@ -197,3 +197,39 @@ def visualize_graph(json_data):
     plt.show()
 
     return None
+
+
+# returns a more general word that best describes the input
+def characterize_word(text, client):
+    prompt = ("Given a single word, return the most appropriate general category or type that describes it. The "
+              "response should be a single word that encapsulates the essence of the input word, such as its "
+              "category, type, or a more general term that describes it. Avoid overly specific or technical terms, "
+              "and aim for broad, intuitive categories.")
+    request = ("Please give a descriptive word that best describes the word I will give you in the next message. "
+               "Return ONLY ONE word")
+
+    completion = client.chat.completions.create(
+        model="ft:gpt-4o-mini-2024-07-18:personal::A31wrlth",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": request},
+            {"role": "user", "content": text}
+        ]
+    )
+
+    return completion.choices[0].message.content
+
+# characterize the attributes of the Knowledge Graph
+def characterize_attributes(json_data, client):
+    for ent in json_data['entities']:
+        if ent['noun_type'] == 'COMMON':
+            new_label = characterize_word(ent['name'], client)
+            ent['label'] = new_label.upper()
+
+        attribute_keys = list(ent['attributes'].keys())
+
+        for key in attribute_keys:
+            new_key = characterize_word(ent['attributes'][key], client)
+            ent['attributes'][new_key] = ent['attributes'].pop(key)
+
+    return json_data
