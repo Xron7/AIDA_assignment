@@ -201,6 +201,7 @@ def visualize_graph(json_data):
 
 # returns a more general word that best describes the input
 def characterize_word(text, client):
+    import time
     prompt = ("Given a single word, return the most appropriate general category or type that describes it. The "
               "response should be a single word that encapsulates the essence of the input word, such as its "
               "category, type, or a more general term that describes it. Avoid overly specific or technical terms, "
@@ -216,7 +217,7 @@ def characterize_word(text, client):
             {"role": "user", "content": text}
         ]
     )
-
+    time.sleep(10)
     return completion.choices[0].message.content
 
 # characterize the attributes of the Knowledge Graph
