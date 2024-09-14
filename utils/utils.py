@@ -157,7 +157,7 @@ def visualize_graph(json_data):
     # Add entities (nodes) to the graph
     entities = {}
     node_sizes = []
-    for ent in json_data['entities']:
+    for ent in json_data['nodes']:
         attributes = ent['attributes']
         attributes_str = '\n '.join(f'{k}: {v}' for k, v in attributes.items()) if attributes else ''
         ent_name = ent['name']
@@ -175,7 +175,7 @@ def visualize_graph(json_data):
         G.add_node(entity_id)
 
     # Add relationships (edges) to the graph
-    for relationship in json_data['relationships']:
+    for relationship in json_data['edges']:
         source = relationship['source']
         target = relationship['target']
         relation = relationship['relation']
