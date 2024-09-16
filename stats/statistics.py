@@ -15,12 +15,15 @@ class Node:
         self.label = label
         self.name = name
 
-
 class Sample:
     def __init__(self, json_data):
         self.nodes = []
         for node in json_data['nodes']:
             self.nodes.append(Node(node['name'], node['label'], node['noun_type'], node['attributes']))
+
+        self.edges = []
+        for edge in json_data['edges']:
+            self.edges.append(edge['relation'])
 
     def get_attribute_names(self):
         attribute_names = []
@@ -52,6 +55,8 @@ statistics      = {}
 count           = 0
 node_percent    = []
 excess_nodes    = []
+edge_percent    = []
+excess_edges    = []
 attr_name_ratio = []
 label_ratio     = []
 
@@ -81,6 +86,15 @@ with open(sys.argv[1]) as auto, open(sys.argv[2]) as ref:
 
         label_ratio.append(compute_ratio(auto_labels, ref_labels))
 
+        # Edges
+        auto_edges = set(auto_sample.edges)
+        ref_edges  = set(ref_sample.edges)
+
+        edge_intersection = auto_edges & ref_edges
+
+        edge_percent.append(len(edge_intersection) / len(ref_edges))
+        excess_edges.append(len(auto_edges - edge_intersection))
+
         statistics['AVG Nodes Identified (%)']      = round(np.mean(node_percent) * 100, 2)
         statistics['SD Nodes Identified (%)']       = round(np.std(node_percent) * 100, 2)
         statistics['AVG Excess Nodes Identified']   = round(np.mean(excess_nodes), 2)
@@ -89,6 +103,8 @@ with open(sys.argv[1]) as auto, open(sys.argv[2]) as ref:
         #statistics['SD Attributes Identified (%)']  = round(np.std(attr_name_ratio) * 100, 2)
         statistics['AVG Correct Labels (%)']        = round(np.mean(label_ratio) * 100, 2)
         # statistics['SD Correct Labels (%)']         = round(np.std(label_ratio) * 100, 2)
+        statistics['AVG Edges Identified (%)']      = round(np.mean(edge_percent) * 100, 2)
+        statistics['SD Edges Identified (%)']       = round(np.std(edge_percent) * 100, 2)
 
 print('SOME STATISTICS')
 print(tabulate(list(statistics.items()), tablefmt='grid'))
