@@ -14,7 +14,7 @@ PROMPT  = ("Given a JSON which depicts nodes and edges of a Knowledge Graph, rec
            "DO NOT overuse excess words. Reply only with a single paragraph of continuous text, no new lines.")
 REQUEST = ("I will give you a JSON which depicts nodes and edges of a Knowledge Graph, and I would like you to recI "
            "will give you a JSON which depicts nodes and edges of a Knowledge Graph, and I would like you to "
-           "reconstruct the story described, do not overuse excess words ok?ostruct the story described, "
+           "reconstruct the story described."
            "DO NOT overuse excess words. Please reply in a single paragraph.")
 
 with open(input_file, 'r') as file, open(OUTPUT, 'w') as output_file:
